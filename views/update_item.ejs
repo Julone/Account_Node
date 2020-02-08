@@ -71,15 +71,13 @@
                                 type: type
                             },
                             success(data) {
-                                if (data.code == 200) {
+                              
                                     $('#account_reason').html(data.data.map(el => {
                                         return `<option value='${el._id}'>${el.type_name}</option>`
                                     }))
                                     form.render();
                                     cb && cb();
-                                } else {
-                                    layer.msg('获取记录类型失败');
-                                }
+                            
                             }
                         })
                     }
@@ -97,7 +95,7 @@
                             account_id: `<%= account_id%>`
                         },
                         success(data) {
-                            if (data.code == 200) {
+                   
                                 let [item] = data.data;
                                 form.val("demo2", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
                                     account_num: item
@@ -114,9 +112,7 @@
                                     trigger: 'click' 
                                 });
                                 console.log(data);
-                            } else {
-                                layer.msg('获取记录类型失败');
-                            }
+                        
                         }
                     })
                     });

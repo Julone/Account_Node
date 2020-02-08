@@ -4,38 +4,37 @@ var bcrypt = require('./../../util/bcrypt');
 var userModel = require('./../../schema/user_list');
 var clockModel = require('./../../schema/clockin_list');
 router.post('/info',(req,res) => {
-    var user_id = req.session.user_id;
-    var date = new Date();
-    var today = date.getFullYear() +'/'+(date.getMonth()+2) +"/" + date.getDate();
+    var user_id = req.session.user_id; //用户ID
+    var date = new Date();//今日日期
+    var today = date.getFullYear() +'/'+(date.getMonth()+1) +"/" + date.getDate();
     userModel.findById(user_id,async (err,docs)=>{
-        if(err) res.json({code: 404, data: {}});
+        if(err) res.json({code: 404, msg:'找不到用户'});
         if(docs){
             var clockDays = await clockModel.find({
                 user_id: user_id.trim()
-            }).countDocuments();
-            
-            var isClocked = await !!(clockModel.findOne({
+            }).countDocuments(); //总共签到日期
+  
+            var isClocked = !! await clockModel.findOne({
                 add_time: {
                     $gt: new Date(today),
                     $lt: new Date(new Date(today).getTime() + 1000 * 60 * 60 * 24)
-                },
-                user_id: user_id
-            }).countDocuments());
+                },//大于今天的00:00且小于明天的00:00。
+                user_id: user_id//用户名
+            }).countDocuments();//今日是否签到
             var {user_sex,user_name,user_remark,user_birthday} = docs;
-                res.json({code:200,data:{
-                    user_sex,user_name,user_remark,user_birthday,
-                    clockDays,isClocked
-                }})
+            return res.json({code:200,data:{ 
+                user_sex,user_name,user_remark,user_birthday,
+                clockDays,isClocked}})
         } else{
-            res.json({code:404, data: {},msg:'找不到用户'});
+            res.json({code:404, msg:'找不到用户'});
         }
     })
 })
 
 router.post('/clockin',(req,res)=>{
-    var user_id = req.session.user_id || "5e329aa6a1339d4108a1c7a0";
+    var user_id = req.session.user_id;
     var date = new Date();
-    var today = date.getFullYear() +'/'+(date.getMonth()+2) +"/" + date.getDate();
+    var today = date.getFullYear() +'/'+(date.getMonth()+1) +"/" + date.getDate();
     clockModel.findOne({
         add_time: {
             $gt: new Date(today),
@@ -51,7 +50,7 @@ router.post('/clockin',(req,res)=>{
                 doc.updateOne({
                     update_time:new Date()
                 },(err,row)=>{
-                    res.json({code:201,msg:'签到更新成功'})
+                    res.json({code:201,msg:'今日已签到，无需再次签到'})
                 })
             }else{
                 new clockModel({user_id:user_id,add_time:new Date()}).save((err,doc)=>{

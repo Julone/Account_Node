@@ -94,8 +94,14 @@
                                             "user_remark": user_data.user_remark,
                                             "user_birthday": user_data.user_birthday.slice(0,10)
                                         });
+                                        $('#clockin').attr('clockday',user_data.clockDays)
                                         $('#user_name').text('你好，' + user_data.user_name);
-
+                                        if(user_data.isClocked){
+                                            $('#clockin').text('已签到，共' + $('#clockin').attr('clockday')+"天")
+                                        }else{
+                                            $('#clockin').text("打卡签到")
+                                        }
+                                     
                                         form.render();
                                     } else {
                                         layer.msg('获取用户信息失败');
@@ -137,10 +143,12 @@
                                         type:'POST',
                                         success(data){
                                             layer.msg(data.msg);
-                                            _this.text('sdf')
+                                            var days = Number($('#clockin').attr('clockday')) + 1;
+                                            if(data.code ==200)
+                                            $('#clockin').text('已签到' + days +"天")
                                         }
                                     })
-                                    
+
                             })
                             form.on('submit(formSubmit)', function (data) {
                                 layer.confirm('是否要更改资料？', {
