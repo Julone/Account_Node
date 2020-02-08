@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./layout/header.ejs') %>
+    <title></title>
+</head>
+
+<body>
+    <div class="box">
+        <div class="roll">
+            <div class="addContent__container" style="width: 90%;margin:20px auto">
+                <form class="layui-form" lay-filter="demo2" action="">
+                    <div class="layui-form-item" style="display: flex;justify-content: space-between;">
+                        <h1 id="user_name" style="flex: 1;">23</h1>
+                        <a class="layui-btn layui-btn-primary" id="clockin">签到</a>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">用户名</label>
+                        <div class="layui-input-block" style="display: flex;align-items: center;">
+                            <input type="text" name="user_name"
+                            lay-verify="required" required placeholder="请输入名"
+                                autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">用户性别</label>
+                        <div class="layui-input-block">
+                            <input type="radio" lay-filter='radio1' name="user_sex" value="boy" title="男" checked>
+                            <input type="radio" lay-filter='radio1' name="user_sex" value="girl" title="女">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">修改密码</label>
+                        <div class="layui-input-block">
+                            <button type="button" class="layui-btn layui-btn-primary" 
+                                lay-submit  lay-filter="changePass">
+                                修改密码</button>
+                        </div>
+                    </div>
+                 
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">用户生日</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="user_birthday" id="date" lay-verify="date"
+                             placeholder="出生日期" autocomplete="off" 
+                                class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">用户介绍</label>
+                        <div class="layui-input-block">
+                            <textarea name="user_remark" placeholder="请输入用户介绍" class="layui-textarea"></textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="formSubmit">
+                                更改资料</button>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button type="button" id="exit" class="layui-btn layui-btn-danger layui-btn-fluid">退出登录</button>
+                        </div>
+                    </div>
+                </form>
+        
+                <script>
+                    $(function () {
+                        $('#exit').click(function(){
+                            layer.confirm('是否要退出？', {
+                                btn: ['确定','取消'], //按钮,
+                                title:'警告'
+                            }, function(){
+                                window.location.href = '/login'
+                            }, function(){
+                              
+                            });
+                        })
+                        layui.use(['form', 'laydate'], function () {
+                            var form = layui.form;
+                            var laydate = layui.laydate;
+                     
+                            $.ajax({
+                                url: '/api/user/info',
+                                type: 'POST',
+                                success(data) {
+                                    if (data.code == 200) {
+                                        var user_data = data.data;
+                                        form.val("demo2", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                                            "user_name": user_data.user_name,
+                                            "user_sex": user_data.user_sex,
+                                            "user_remark": user_data.user_remark,
+                                            "user_birthday": user_data.user_birthday.slice(0,10)
+                                        });
+                                        $('#user_name').text('你好，' + user_data.user_name);
+
+                                        form.render();
+                                    } else {
+                                        layer.msg('获取用户信息失败');
+                                    }
+                                }
+                            })
+                         
+                            laydate.render({
+                                elem: '#date',
+                                value:new Date(),
+                                trigger: 'click'
+                            });
+       
+                            form.on('radio(radio1)', function (data) {
+                                console.log(data)
+                                form.render();
+                            });
+                            form.on('checkbox(radio1)', function (data) {
+                                console.log(data.elem); //得到radio原始DOM对象
+                                console.log(data.value); //被点击的radio的value值
+                            });
+                            form.on('submit(changePass)',data =>{
+                                layer.closeAll();
+                                var target = $(this);
+                                var index = layer.open({
+                                    type: 2,
+                                    area: ['90%', '400px'],
+                                    fixed: false, //不固定
+                                    maxmin: true,
+                                    title: '修改密码',
+                                    scrollbar:false,
+                                    content: 'update_pass' 
+                                });
+                            })
+                            $('#clockin').click(function(){
+                                var _this = $(this);
+                                $.ajax({
+                                        url:'/api/user/clockin',
+                                        type:'POST',
+                                        success(data){
+                                            layer.msg(data.msg);
+                                            _this.text('sdf')
+                                        }
+                                    })
+                            })
+                            form.on('submit(formSubmit)', function (data) {
+                                layer.confirm('是否要更改资料？', {
+                                    btn: ['确定','取消'], //按钮,
+                                    title:'提示'
+                                }, function(){
+                                    var user_data = data.field;
+                                    $.ajax({
+                                        url:'/api/user/changeInfo',
+                                        type:'POST',
+                                        data:{
+                                            "user_name": user_data.user_name,
+                                            "user_sex": user_data.user_sex,
+                                            "user_remark": user_data.user_remark,
+                                            "user_birthday": user_data.user_birthday
+                                        },
+                                        success(data){
+                                            layer.msg('更新成功');
+                                            setTimeout(()=>{
+                                                // window.location.reload();
+                                            },300)
+                                        }
+                                    })
+                                }, function(){
+                                
+                                });
+                                
+                                return false;
+                            });
+                            form.render();
+        
+                        });
+                    })
+                </script>
+            </div>
+        
+        </div>
+        <%- include('./layout/nav.ejs',{activeName:'my'}) %>
+
+    </div>
+
+</body>
+
+</html>

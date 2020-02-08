@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./layout/header.ejs')%>
+    <title>Document</title>
+    <link rel="stylesheet" href="css/login.css">
+
+</head>
+<body>
+  <div class="box">
+    <div class="roll">
+      <form class="layui-form" action="/api/login/regist" method="POST">
+        <div class="layui-form-item">
+            <h1 align='center'>注册页面</h1>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">用户账号</label>
+          <div class="layui-input-block">
+            <input type="text" name="username" lay-verify="required"
+             lay-reqtext="请输入用户账号" placeholder="请输入用户账号"
+              autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户密码</label>
+            <div class="layui-input-block">
+              <input type="password" name="userpass" lay-verify="required"
+               lay-reqtext="请输入用户密码" placeholder="请输入用户密码"
+                autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">确认密码</label>
+            <div class="layui-input-block">
+              <input type="password" name="userpass2" lay-verify="required"
+               lay-reqtext="输入确认密码" placeholder="请输入确认密码"
+                autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+              <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+          </div>
+          <div class="layui-form-item jump">
+            <a href="/login">已有账号？前往登录</a>
+          </div>
+    </form>
+
+    <!-- <%- include('./layout/footer.ejs') %> -->
+    </div>
+    <%- include('./layout/nav.ejs') %>
+
+  </div>
+    
+</body>
+</html>

@@ -1,0 +1,46 @@
+<div class="nav-container">
+  <ul class="layui-nav app-nav" lay-filter="demo">
+    <!-- <div class="left" style="margin-right: 100px;">
+      <img src="/img/money.svg" class="layui-anim-scaleSpring" width="40" alt="">
+    </div> -->
+    <li class="layui-nav-item"><a href="/index">主页</a></li>
+    <li class="layui-nav-item"><a href="/add_item">记账</a></li>
+    <li class="layui-nav-item"><a href="/chart">图表</a></li>
+    <!-- <li class="layui-nav-item"><a href="/clockin">打卡</a></li> -->
+    <!-- <li class="layui-nav-item">
+      <a href="javascript:;">功能</a>
+      <dl class="layui-nav-child"> 
+        <dd><a href="">移动模块</a></dd>
+        <dd><a href="">后台模版</a></dd>
+        <dd><a href="">电商平台</a></dd>
+      </dl>
+    </li> -->
+    <li class="layui-nav-item"><a href="/my">我的</a></li>
+</ul>
+</div>
+<style>
+  .nav-container{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    width: 100vw;
+  }
+  .layui-nav.app-nav{
+    width: 100%;
+    display: flex;
+    /* justify-content: space-around; */
+    align-items: center;
+    justify-content: center;
+ 
+  }
+
+</style>
+
+<script>
+    $(function(){
+        var [pathname] = location.pathname.split('?');
+        $(`.layui-nav a[href*='${pathname}']`).parent('li').addClass('layui-this');
+
+    })
+</script>

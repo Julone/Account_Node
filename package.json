@@ -1,0 +1,27 @@
+{
+  "name": "untitled",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "set PORT=3008 && nodemon ./bin/www"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "ejs": "^3.0.1",
+    "express": "~4.16.1",
+    "express-session": "^1.17.0",
+    "http-errors": "~1.6.3",
+    "http-proxy": "^1.18.0",
+    "less-middleware": "~2.2.1",
+    "mockjs": "^1.1.0",
+    "mongodb": "^3.4.1",
+    "mongoose": "^5.8.7",
+    "morgan": "~1.9.1",
+    "nodemon": "^2.0.2",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5"
+  }
+}

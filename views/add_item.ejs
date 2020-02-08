@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./layout/header.ejs') %>
+    <title></title>
+</head>
+
+<body>
+    <div class="box">
+        <div class="roll">
+            <div class="addContent__container" style="width: 90%;margin:0px auto">
+                <form class="layui-form" lay-filter="demo2" action="">
+                    <div class="layui-form-item" style="display: flex;justify-content: center;">
+                        <img src="/img/money.svg" alt="" width="100">
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">消费金额</label>
+                        <div class="layui-input-block" style="display: flex;align-items: center;">
+                            <span style="padding: 0 10px 0 2px ;">￥</span>
+                            <input type="number" name="account_num" lay-verify="required" required placeholder="请输入金额"
+                                autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">消费类型</label>
+                        <div class="layui-input-block">
+                            <input type="radio" lay-filter='radio1' name="account_type" value="out" title="支出" checked>
+                            <input type="radio" lay-filter='radio1' name="account_type" value="in" title="收入">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">记录类别</label>
+                        <div class="layui-input-block" style="display: flex;">
+                            <select name="account_reason" id="account_reason">
+                            </select>
+                            <a href="/update_type" style="margin-left: 10px;">
+                                <button type="button" class="layui-btn layui-btn-primary">自定义类别</button>                            
+                            </a>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">记录时间</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="account_date" id="date" lay-verify="date" placeholder="选择记录时间" autocomplete="off"
+                                class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">备注信息</label>
+                        <div class="layui-input-block">
+                            <textarea name="account_desc" placeholder="备注这条记录..." class="layui-textarea"></textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="formSubmit">立即提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </form>
+        
+                <script>
+                    $(function () {
+                        layui.use(['form', 'laydate'], function () {
+                            var form = layui.form;
+                            var laydate = layui.laydate;
+        
+                            function getType(type, form) {
+                                $.ajax({
+                                    url: '/api/account/getTypeList',
+                                    type: 'POST',
+                                    data: {
+                                        type: type
+                                    },
+                                    success(data) {
+                                
+                                            $('#account_reason').html(data.data.map(el => {
+                                                return `<option value='${el._id}'>${el.type_name}</option>`
+                                            }))
+                                            form.render();
+                                       
+                                    }
+                                })
+                            }
+                            laydate.render({
+                                elem: '#date',
+                                value:new Date(),
+                                trigger: 'click'
+                            });
+                            //监听提交
+                            // form.render();
+                            getType('out', form);
+                            form.on('radio(radio1)', function (data) {
+                                console.log(data)
+                                getType(data.value, form);
+                                form.render();
+                            });
+                            form.on('checkbox(radio1)', function (data) {
+                                console.log(data.elem); //得到radio原始DOM对象
+                                console.log(data.value); //被点击的radio的value值
+                            });
+                            form.on('submit(formSubmit)', function (data) {
+                                var formData = data.field;
+                                $.ajax({
+                                    url:'/api/account/postAccountData',
+                                    type:'POST',
+                                    data:{
+                                        account_reason:formData.account_reason ,
+                                        account_type:formData.account_type,
+                                        account_num: formData.account_num,
+                                        account_date: formData.account_date,
+                                        account_desc: formData.account_desc
+                                    },
+                                    success(data){
+                                        if(data.code == 200) {
+                                            location.href = "/index";
+                                            layer.msg('记录成功')
+                                        }else{
+                                            layer.msg('记录失败')
+                                        }
+                                    }
+                                })
+                                return false;
+                            });
+                            form.render();
+        
+                        });
+                    })
+                </script>
+            </div>
+            <!-- <%- include('./layout/footer.ejs')%> -->
+        </div>
+        <%- include('./layout/nav.ejs',{activeName:'clockin'}) %>
+
+    </div>
+</body>
+
+</html>

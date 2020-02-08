@@ -1,0 +1,49 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\julone\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add bcrypt
+
+PATH: 
+  C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\julone\AppData\Local\Programs\Python\Python38-32\Scripts\;C:\Users\julone\AppData\Local\Programs\Python\Python38-32\;C:\Users\julone\AppData\Local\Microsoft\WindowsApps;D:\Program Files\Microsoft VS Code\bin;C:\Users\julone\AppData\Roaming\npm;;C:\Program Files\JetBrains\WebStorm 2019.2.4\bin;;C:\Program Files\JetBrains\PyCharm 2019.2.5\bin;
+
+Yarn version: 
+  1.19.1
+
+Node version: 
+  10.15.3
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: ENOENT: no such file or directory, copyfile 'C:\Users\julone\AppData\Local\Yarn\Cache\v6\npm-ms-2.1.2-d09d1f357b443f493382a8eb3ccd183872ae6009-integrity\node_modules\ms\index.js' -> 'C:\Users\julone\Desktop\Express_demo\node_modules\follow-redirects\node_modules\ms\index.js'
+
+npm manifest: 
+  {
+    "name": "untitled",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+      "start": "set PORT=3008 && nodemon ./bin/www"
+    },
+    "dependencies": {
+      "cookie-parser": "~1.4.4",
+      "cors": "^2.8.5",
+      "debug": "~2.6.9",
+      "ejs": "^3.0.1",
+      "express": "~4.16.1",
+      "express-session": "^1.17.0",
+      "http-errors": "~1.6.3",
+      "http-proxy": "^1.18.0",
+      "less-middleware": "~2.2.1",
+      "mockjs": "^1.1.0",
+      "mongodb": "^3.4.1",
+      "morgan": "~1.9.1",
+      "nodemon": "^2.0.2",
+      "request": "^2.88.0"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

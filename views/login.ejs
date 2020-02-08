@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./layout/header.ejs')%>
+    <title>账号登录</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+  <div class="box">
+    <div class="roll">
+      <form class="layui-form" action="/api/login/login" method="POST">
+        <div class="layui-form-item">
+            <h1 align='center'>登录页面</h1>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">用户账号</label>
+          <div class="layui-input-block">
+            <input type="text" name="user_id" lay-verify="required"
+             lay-reqtext="请输入用户账号" placeholder="请输入"
+              autocomplete="off" value="hwq" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户密码</label>
+            <div class="layui-input-block">
+              <input type="password" name="user_pass" lay-verify="required"
+               lay-reqtext="请输入用户密码" placeholder="请输入"
+                autocomplete="off" class="layui-input" value="hwq">
+            </div>
+          </div>
+        
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+              <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+          </div>
+          <div class="layui-form-item jump">
+            <a href="/regist">未有账号？前往注册</a>
+          </div>
+
+    </form>
+
+    <!-- <%- include('./layout/footer.ejs') %> -->
+
+    </div>
+   
+    <%- include('./layout/nav.ejs') %>
+
+  </div>
+  
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./layout/header.ejs') %>
+</head>
+
+<body>
+    <div class="box">
+        <div class="roll" style="padding: 0;">
+            <div class="addContent__container" style="width: 100%;margin:10px auto;padding: 5px;box-sizing: border-box;">
+                <h1>自定义类别 <button class="layui-btn" id="addmore" style="float: right;">添加新项</button></h1>
+                <table id="demo" lay-filter="test"></table>
+                <form class="layui-form" lay-filter="editForm" id="editForm" hidden action="">
+                    <input type="hidden" name="type_id">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">类别名称</label>
+                        <div class="layui-input-block" style="display: flex;align-items: center;">
+                            <input type="text" name="type_name" lay-verify="required"
+                             required placeholder="请输入类别名称"
+                                autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">类别类型</label>
+                        <div class="layui-input-block" style="display: flex;align-items: center;">
+                            <select name="type_type">
+                                <option value="out">支出</option>
+                                <option value="in">收入</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="editSubmit">立即修改</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">关闭</button>
+                        </div>
+                    </div>
+                </form>
+                <form class="layui-form" lay-filter="addForm" id="addForm" style="padding:30px 10px;" hidden action="">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">类别名称</label>
+                        <div class="layui-input-block" style="display: flex;align-items: center;">
+                            <input type="text" name="type_name" lay-verify="required"
+                             required placeholder="请输入类别名称"
+                                autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">类别类型</label>
+                        <div class="layui-input-block" style="display: flex;align-items: center;">
+                            <select name="type_type" id="">
+                                <option value="out">支出</option>
+                                <option value="in">收入</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="addSubmit">立即添加</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">关闭</button>
+                        </div>
+                    </div>
+                </form>
+                <script type="text/html" id="barDemo">
+                    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                  </script>
+                <script>
+                    $(function () {
+                        $(document).on('click','button[type="reset"]',function(){
+                            layer.closeAll();
+                        })
+                        layui.use(['form', 'table'], function () {
+                            var form = layui.form;
+                            var table = layui.table;
+                            table.render({
+                                elem: '#demo'
+                                ,height: 600
+                                ,url: '/api/account/getTypeList' //数据接口
+                             
+                                ,cols: [[ //表头
+                                
+                                { title: 'ID', width:80, type:'numbers'}
+                            
+                                ,{field: 'type_name', title: '名称', sort: true,width:120}
+                                ,{field: 'type_type', title: '类型',sort:true, width:80,
+                                templet: function(d){
+                                
+                                    return `<span style="color: #c00;">${d.type_type == 'out'? '支出': '收入'}</span>`
+                                }
+                            }
+                                ,{fixed: 'right', title:'类型操作',width:120, align:'center', toolbar: '#barDemo'} //这里的toolbar值是模板元素的选择器
+                                ]]
+                            });
+                            table.on('tool(test)', function(obj){ //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+                                var data = obj.data; //获得当前行数据
+                                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                                var tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+                                if(layEvent === 'del'){ //删除
+                                    layer.confirm('是否删除该行？', function(index){
+                                        $.ajax({
+                                            url: '/api/account/delTypeList',
+                                            type: 'POST',
+                                            data: {type_id: data._id},
+                                            success(data) {
+                                                layer.msg(data.msg);
+                                                if(data.code == 200){
+                                                    obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                                                    layer.close(index);
+                                                }
+                                            }
+                                        })
+                                    });
+                                } else if(layEvent === 'edit'){ //编辑
+                                    //do something
+                              
+                                   var ind = layer.open({
+                                            type:1,
+                                            area: ['90%', '300px'],
+                                            fixed: false, //不固定
+                                            maxmin: true,
+                                            title: '修改记录',
+                                            scrollbar:false,
+                                            content: $('#editForm')
+                                    })
+                                        console.log(ind)
+                                            form.val("editForm", {
+                                                type_name:data.type_name,
+                                                type_type:data.type_type,
+                                                type_id:data._id
+                                            });
+                                            form.on('submit(editSubmit)', function (data) {
+                                                    var formData = data.field;
+                                                    $.ajax({
+                                                        url: '/api/account/editTypeList',
+                                                        type: 'POST',
+                                                        data: formData,
+                                                        success(data) {
+                                                            layer.msg(data.msg);
+                                                            if(data.code == 200){
+                                                                obj.update({
+                                                                    type_type:formData.type_type,
+                                                                    type_name:formData.type_name,
+                                                                    type_id:formData.type_id
+                                                                });
+                                                                layer.close(ind);
+                                                            }
+                                                        }
+                                                    })
+                                                    return false;
+                                            });
+        
+        
+        
+                                    
+                                }
+                            });
+                            $('#addmore').click(function () { 
+                                // $('#addForm').show();
+                                layer.open({
+                                    type:1,
+                                        area: ['90%', '300px'],
+                                        fixed: false, //不固定
+                                        maxmin: true,
+                                        title: '修改记录',
+                                        scrollbar:false,
+                                        content: $('#addForm')
+                                    });
+                                    form.on('submit(addSubmit)', function (data) {
+                                            var formData = data.field;
+                                            $.ajax({
+                                                url: '/api/account/addTypeList',
+                                                type: 'POST',
+                                                data: formData,
+                                                success(data) {
+                                                    layer.msg(data.msg);
+                                                    if(data.code == 200){
+                                                        setTimeout(function(){
+                                                            window.parent.layer.closeAll();
+                                                            window.parent.location.reload();
+                                                        },600)
+                                                    }
+                                                }
+                                            })
+                                            return false;
+                                    });
+                            })
+          
+                           
+                            form.render();
+                        });
+                    })
+                </script>
+            </div>
+        </div>
+        <%- include('./layout/nav.ejs') %>
+    </div>
+ 
+</body>
+
+</html>

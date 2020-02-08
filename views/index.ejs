@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./layout/header.ejs')%>
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/index.css">
+    <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.5.3/less.min.js"></script> -->
+</head>
+
+<body>
+    <div class="box">
+        <div class="roll">
+            <div class="actionbar-container">
+                <div class="actionbar-wrapper">
+                    <div class="left">
+                        <div id="cur_Year">
+                            <h1></h1>
+                            <select name="" onchange="app.loadRecord()" id="year-select">
+                            </select>
+                        </div>
+                        <div id="cur_Month">
+                            <h1></h1>
+                            <select name="" onchange="app.loadRecord()" id="month-select">
+        
+                            </select>
+                        </div>
+                    </div>
+        
+                </div>
+        
+            </div>
+        
+            <script>
+                $(function () {
+                    var date = new Date();
+                    var str = Array.from({
+                        length: 5
+                    }, (el, i) => {
+                        var v = date.getFullYear() - i;
+                        return `<option value='${v}' ${v == date.getFullYear()?'selected':''}>${v}</option>`
+                    });
+                    $('#year-select').html(str.join(''))
+                    var str2 = Array.from({
+                        length: 12
+                    }, (el, i) => {
+                        return `<option value='${i+1}' ${i == date.getMonth()?'selected':''}>${i+1}</option>`
+                    });
+                    console.log(str2);
+                    $('#month-select').html(str2.join(''));
+                    app.loadRecord();
+                })
+            </script>
+        
+            <div class="card-container">
+                <div class="card-wrapper">
+                    <blockquote class="layui-elem-quote layui-quote-nm">引用区域的文字</blockquote>
+                </div>
+            </div>
+            <script>
+                window.app = {
+                    async loadRecord(){
+                        let data = await this.ajax();
+                        let group = this.formatData(data.data);
+                        this.renderDOM(group);
+                        this.bindEvent();
+                    },
+                    renderDOM(group) {
+                        $('#cur_Year h1').text(this.ys + "年");
+                        $('#cur_Month h1').text(this.ms + "月");
+                        var html = '';
+                        if(JSON.stringify(group) == '{}'){
+                            html += `
+                            <div style='width:90%;margin:0 auto;height:400px;display:flex;justify-content:flex-start;flex-direction:column;align-items:center'>
+                                <blockquote class="layui-elem-quote layui-quote-nm" style> 该月没有数据</blockquote>
+                                <a href='/add_item' class='layui-btn layui-btn-radius layui-btn-primary'>开始记账</a>
+                                </div>
+                           `
+                        }
+                        for (let el in group) {
+                            html += `<div class='card-item'>
+                            <div class="title">
+                                <div class="left">${el}</div>
+                                <div class="right">
+                                    <div>
+                                        支出 ￥<span class='num1'>${group[el].total.out}</span>
+                                    </div>
+                                    <div>
+                                        收入 ￥<span class='num2'>${ group[el].total.in }</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='content'>
+                                ${group[el]['arr'].reduce((t,ele) =>{
+                                    t+= `<div class="item" >
+                                            <div class='main'>
+                                                <div class="left">
+                                                    <i class="icon"></i>
+                                                    <span class='type_name'>${ele.account_reason.type_name}</span>
+                                                    
+                                                </div>
+                                                <div class="right">
+                                                   <span class='${ele.account_type =='in'? 'num1':'num2'}'>
+                                                        ${ele.account_type =='in'? '+':'-'}${ele.account_num}</span>
+                                                </div>
+                                            </div>
+                                            <div class="desc">
+                                                <div class='desc-left'>  
+                                                备注：
+                                                ${ele.account_desc}
+                                                </div>
+                                                <div class='desc-right'>
+                                                    <button class="layui-btn  layui-btn-xs layui-btn-primary del_btn" data-id="${ele._id}" >删除</button>
+                                                    <button class="layui-btn  layui-btn-xs layui-btn-primary update_btn" data-id="${ele._id}" >修改</button>
+                                                </div>
+                                            </div>
+                                        </div>`
+                                    return t;
+                                    },'')
+                                }
+                            </div>
+                            </div>`;
+                        }
+          
+                        $('.card-wrapper').html(html);
+                    },
+                    bindEvent(){
+                        $(document).on('click', '.del_btn', function (e) {
+                            var target = $(this);
+                            layer.confirm('是否删除此记录', {
+                                icon: 3,
+                                title: '提示'
+                            }, function (index) {
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/api/account/deleteAccount",
+                                    data: {
+                                        account_id: target.attr('data-id')
+                                    },
+                                    success: function (response) {
+                                        target.parents('.item').remove();
+                                        $('.card-item .content').not(':has(.item)')
+                                        .parents('.card-item').remove();//没有记录的删除那天
+                                        layer.msg('删除成功');
+                                    },
+                                    error(){
+                                        layer.msg('删除失败')
+                                    }
+                                });
+                            });
+                        })
+                        $(document).on('click', '.item', function (e) {
+                            var target = $(this);
+                            target.addClass('active').siblings('.item').removeClass('active')
+                        })
+                        $(document).on('click', '.update_btn', function (e) {
+                            layer.closeAll();
+                            var target = $(this);
+                            var index = layer.open({
+                                type: 2,
+                                area: ['90%', '500px'],
+                                fixed: false, //不固定
+                                maxmin: true,
+                                title: '修改记录',
+                                scrollbar:false,
+                                content: 'update_item?account_id='+target.attr('data-id')
+                            });
+                        })
+                    },
+                    formatData(data){
+                        console.log(data);
+                        return data.reduce((prev, el )=> {
+                            var k = String(el.account_date);
+                            if (!prev[k]) { prev[k] = { arr: [], total: { in: 0, out: 0 } }; }
+                            prev[k]['arr'].push(el)
+                            prev[k].total[el.account_type == 'in' ? 'in' : 'out'] += el.account_num;
+                            return prev;
+                        }, Object.create(null));
+                    },
+                    get ys(){
+                        return  $('#year-select').val();
+                    },
+                    get ms(){
+                        return $('#month-select').val()
+                    },
+                    layer_index: null,
+                    ajax(){
+                        let _this = this;
+                        return new Promise((resolve,reject)=>{
+                            $.ajax({
+                                type: "post",
+                                url: "/api/account/getAccountData",
+                                data: {
+                                    monthExp: this.ys + '/' + this.ms.padStart(2, '0')
+                                },
+                                success(data){
+                                    resolve(data);
+                                }
+                            })
+                        })
+                    }
+                }
+        
+            </script>
+        </div>
+        <%- include('./layout/nav.ejs') %>
+
+    </div>
+</body>
+
+</html>

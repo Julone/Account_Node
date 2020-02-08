@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./layout/header.ejs')%>
+    <title></title>
+    <link rel="stylesheet" href="/css/index.css">
+</head>
+
+<body>
+    <div class="box">
+        <div class="roll">
+            <div class="actionbar-container">
+                <div class="actionbar-wrapper">
+                    <div class="left">
+                        <div id="cur_Year">
+                            <h1></h1>
+                            <select name="" onchange="app.loadRecord()" id="year-select">
+                            </select>
+                        </div>
+                        <div id="cur_Month">
+                            <h1></h1>
+                            <select name="" onchange="app.loadRecord()" id="month-select">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-container">
+                <div class="layui-row">
+                    <div class="layui-col-md6">
+                        <div id="main" style="width:  100%;height:300px;"></div>
+                    </div>
+                    <div class="layui-col-md6">
+                        <div id="bing" style="width:  100%;height: 400px;"></div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-md6">
+                        <div id="main2" style="width: 100%;height:300px;"></div>
+                    </div>
+                    <div class="layui-col-md6">
+                        <div id="bing2" style="width: 100%;height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+            <script src="/js/echarts-gl.min.js"></script>
+            <script src="/js/macarons.js"></script>
+            <script>
+                $(function () {
+                    var date = new Date();
+                    var str = Array.from({
+                        length: 5
+                    }, (el, i) => {
+                        var v = date.getFullYear() - i;
+                        return `<option value='${v}' ${v == date.getFullYear()?'selected':''}>${v}</option>`
+                    });
+                    $('#year-select').html(str.join(''))
+                    var str2 = Array.from({
+                        length: 12
+                    }, (el, i) => {
+                        return `<option value='${i+1}' ${i == date.getMonth()?'selected':''}>${i+1}</option>`
+                    });
+                    console.log(str2);
+                    $('#month-select').html(str2.join(''));
+                    app.loadRecord();
+                })
+                var app = {
+                    get ys() {
+                        return $('#year-select').val();
+                    },
+                    get ms() {
+                        return $('#month-select').val().padStart(2, '0')
+                    },
+                    loadRecord() {
+                        $('#cur_Year h1').text(this.ys + "年");
+                        $('#cur_Month h1').text(this.ms + "月");
+                        var _this = this;
+                        var labelConfig = {
+                            formatter: '{a|{a}}{abg|}\n{hr|}\n  {b|{b} }{per|{d}%}  ',
+                            backgroundColor: '#eee',
+                            borderColor: '#aaa',
+                            borderWidth: 1,
+                            borderRadius: 10,
+                            rich: {
+                                a: {
+                                    color: '#999',
+                                    lineHeight: 22,
+                                    align: 'center'
+                                },
+                                abg: {
+                                    backgroundColor: '#333',
+                                    width: '100%',
+                                    align: 'right',
+                                    height: 22,
+                                    borderRadius: [10, 10, 0, 0]
+                                },
+                                hr: {
+                                    borderColor: '#aaa',
+                                    width: '100%',
+                                    borderWidth: 0.5,
+                                    height: 0
+                                },
+                                b: {
+                                    fontSize: 13,
+                                    fontWeight:700,
+                                    lineHeight: 28
+                                },
+                                per: {
+                                    color: '#eee',
+                                    backgroundColor: '#334455',
+                                    padding: [2, 4],
+                                    borderRadius: 2
+                                }
+                            }
+                        }
+                        $.ajax({
+                            url: '/api/chart/getDataByMonth',
+                            data: {
+                                dateExp: decodeURI(_this.ys + "/" + _this.ms)
+                            },
+                            success(data) {
+                                var myChart = echarts.init(document.getElementById('main'));
+                                var myChart2 = echarts.init(document.getElementById('bing'));
+                                var myChart3 = echarts.init(document.getElementById('main2'));
+                                var myChart4 = echarts.init(document.getElementById('bing2'));
+                                
+                
+                                    // 指定图表的配置项和数据
+                                    var option = {
+                                        title: {
+                                            text: '当月支出',
+                                            subtext: data.data.out.data.length ? '统计该月的支出':'当月没有支出数据',
+                                            left: 'center'
+                                        },
+                                        tooltip: {},
+                                        legend: {
+                                            data: ['支出'],
+                                            orient: 'vertical',
+                                            left: 10,
+                                        },
+                                        dataZoom: [{
+                                            type: 'inside'
+                                        }],
+                                        xAxis: {
+                                            data: Object.keys(data.data.out.countGraphic)
+                                        },
+                                        yAxis: [
+                                            {
+                                                type: 'value',
+                                                name: '金额（元）'
+                                            }
+                                        ],
+                                        series: [{
+                                            name: '支出',
+                                            type: 'line',
+                                            data: Object.values(data.data.out.countGraphic),
+                                            itemStyle: {
+                                                color: new echarts.graphic.LinearGradient(
+                                                    0, 0, 0, 1,
+                                                    [{
+                                                            offset: 1,
+                                                            color: 'rgb(255, 95, 100)'
+                                                        },
+                                                        {
+                                                            offset: 0,
+                                                            color: 'rgb(250,134,139)'
+                                                        }
+                                                    ]
+                                                )
+                                            }
+                                        },
+                                    ]
+                                    };
+                                    option2 = {
+                                        tooltip: {
+                                            trigger: 'item',
+                                            formatter: '{a} <br/>{b}: {c} ({d}%)'
+                                        },
+
+                                        title: {
+                                            text: '支出类型',
+                                            subtext: '统计该月的支出类型占比',
+                                            left: 'center',
+                                        },
+
+                                        series: [{
+                                            data: Object.keys(data.data.out.reasonGraphic).map(
+                                                el => {
+                                                    return {
+                                                        value: data.data.out.reasonGraphic[
+                                                            el],
+                                                        name: el
+                                                    }
+                                                }),
+                                            name: '支出类型',
+                                            type: 'pie',
+                                            radius: ['0%', '40%'],
+                                            avoidLabelOverlap: true,
+
+                                            label: labelConfig,
+                                            labelLine: {
+                                                normal: {
+                                                    show: true
+                                                }
+                                            },
+
+
+                                        }]
+                                    };
+
+                                    // 使用刚指定的配置项和数据显示图表。
+                                    myChart.setOption(option);
+                                    myChart2.setOption(option2);
+                                
+                       
+                                    var option3 = {
+                                    title: {
+                                        text: '当月收入',
+                                        subtext: '统计该月的收入',
+                                        left: 'center'
+                                    },
+                                    tooltip: {},
+                                    legend: {
+                                        data: ['收入'],
+                                        orient: 'vertical',
+                                        left: 10,
+                                    },
+                                    xAxis: {
+                                        data: Object.keys(data.data.in.countGraphic)
+                                    },
+                                    yAxis: [
+                                            {
+                                                type: 'value',
+                                                name: '金额（元）'
+                                            }
+                                        ],
+                                    dataZoom: [{
+                                        type: 'inside'
+                                    }],
+                                    series: [{
+                                        name: '收入',
+                                        type: 'line',
+
+                                        data: Object.values(data.data.in.countGraphic),
+                                        itemStyle: {
+                                            color: new echarts.graphic.LinearGradient(
+                                                0, 0, 0, 1,
+                                                [{
+                                                        offset: 0,
+                                                        color: '#5FB878'
+                                                    },
+                                                    {
+                                                        offset: 1,
+                                                        color: 'rgb(97,160,168)'
+                                                    }
+                                                ]
+                                            )
+                                        },
+                                    }]
+                                };
+                                option4 = {
+                                    tooltip: {
+                                        trigger: 'item',
+                                        formatter: '{a} <br/>{b}: {c} ({d}%)'
+                                    },
+
+                                    // legend: {
+                                    //     orient: 'vertical',
+                                    //     left: 10,
+                                    //     data: Object.values(data.data.out.reasonGraphic)
+                                    // },
+                                    title: {
+                                        text: '收入类型',
+                                        subtext: '统计该月的收入类型占比',
+                                        left: 'center'
+                                    },
+                                    series: [{
+                                            data: data.data.in.data.length? Object.keys(data.data.in.reasonGraphic).map(
+                                            el => {
+                                                return {
+                                                    value: data.data.in.reasonGraphic[el],
+                                                    name: el
+                                                }
+                                            }):[{name:'暂无数据',value:1}],
+
+                                            // [
+                                            //     {value: 335, name: '直接访问'},
+                                            //     {value: 310, name: '邮件营销'},
+                                            //     {value: 234, name: '联盟广告'},
+                                            //     {value: 135, name: '视频广告'},
+                                            //     {value: 1548, name: '搜索引擎'}
+                                            // ],
+                                            name: '收入类型',
+                                            type: 'pie',
+                                            radius: ['0%', '40%'],
+                                            avoidLabelOverlap: false,
+                                            label: labelConfig,
+                                            labelLine: {
+                                                normal: {
+                                                    show: true
+                                                }
+                                            }
+                                        },
+
+                                    ]
+                                };
+
+                                myChart3.setOption(option3);
+                                myChart4.setOption(option4);
+                                }
+
+
+                            
+                        })
+                    }
+
+                }
+            </script>
+            <%- include('./layout/footer.ejs') %>
+        </div>
+        <%- include('./layout/nav.ejs') %>
+
+    </div>
+</body>
+
+</html>

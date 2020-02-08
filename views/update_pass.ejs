@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./layout/header.ejs') %>
+</head>
+
+<body>
+
+    <div class="addContent__container" style="width: 100%;margin:10px auto;padding: 5px;box-sizing: border-box;">
+        <form class="layui-form" lay-filter="demo2" action="">
+        
+            <div class="layui-form-item">
+                <label class="layui-form-label">原始密码</label>
+                <div class="layui-input-block" style="display: flex;align-items: center;">
+                    <input type="text" name="old_pass" lay-verify="required"
+                     required placeholder="请输入原始密码"
+                        autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">新密码</label>
+                <div class="layui-input-block" style="display: flex;align-items: center;">
+                    <input type="text" name="new_pass" lay-verify="required"
+                     required placeholder="请输入新密码"
+                        autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">确认密码</label>
+                <div class="layui-input-block" style="display: flex;align-items: center;">
+                    <input type="text" name="new_pass2" lay-verify="required"
+                     required placeholder="请输入确认密码"
+                        autocomplete="off" class="layui-input">
+                </div>
+            </div>
+     
+            
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="formSubmit">立即修改</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+
+        <script>
+            $(function () {
+                layui.use(['form', 'laydate'], function () {
+                    var form = layui.form;
+                    form.on('submit(formSubmit)', function (data) {
+                        var formData = data.field;
+                        $.ajax({
+                            url: '/api/user/changePassword',
+                            type: 'POST',
+                            data: formData,
+                            success(data) {
+                                layer.msg(data.msg);
+                                if(data.code == 200){
+                                    setTimeout(function(){
+                                        window.parent.layer.closeAll();
+                                        window.parent.location.href = '/login';
+                                    },600)
+                                }
+                            }
+                        })
+                        return false;
+                    });
+                    form.render();
+                });
+            })
+        </script>
+    </div>
+</body>
+
+</html>

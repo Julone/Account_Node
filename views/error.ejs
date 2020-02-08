@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./layout/header.ejs')%>
+    <title>Document</title>
+</head>
+
+<body>
+    <%- include('./layout/nav.ejs') %>
+    <div style="padding:10px 30px; text-align: left;width: 800px;margin: 0 auto;word-break: break-all;">
+        <h1><%= message %></h1>
+        <h2><%= error.status %></h2>
+        <pre><%= error.stack %></pre>
+    </div>
+    <%- include('./layout/footer.ejs') %>
+</body>
+
+</html>
