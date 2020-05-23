@@ -1,6 +1,7 @@
 var router = require('express').Router();
 const mongoose = require('mongoose');
-const url = 'mongodb://127.0.0.1:27017/hwq?gssapiServiceName=mongodb';
+// const url = 'mongodb://127.0.0.1:27017/hwq?gssapiServiceName=mongodb';
+const url = `mongodb+srv://julone:qwer183371456@cluster0-md2az.mongodb.net/account_node?retryWrites=true&w=majority`;
 mongoose.connect(url, { useUnifiedTopology: true,useNewUrlParser:true } );//连接mongodb数据库
 var db = mongoose.connection;// 实例化连接对象
 db.on('error', console.error.bind(console, '连接错误：'));
