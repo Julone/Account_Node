@@ -8,10 +8,29 @@
 <body>
     <div class="box">
         <div class="roll" style="padding: 0;">
+            <style>
+                .sticky{
+                    position: sticky;
+                    top: -2px;
+                    z-index: 1000;
+                    background:rgb(244,245,250);
+                    padding: 20px 10px 20px 0;
+                    border-bottom: 1px solid #80808030;
+                  
+                }
+                .sticky .back{
+                    padding: 0 5px;
+    font-size: 25px;
+
+    display: inline-block;
+                }
+            </style>
             <div class="addContent__container" style="width: 100%;margin:10px auto;padding: 5px;box-sizing: border-box;">
-                <h1>自定义类别 <button class="layui-btn" id="addmore" style="float: right;">添加新项</button></h1>
+                <h1 class="sticky">
+                    <i class="layui-icon back"></i>
+                    自定义类别 <button class="layui-btn" id="addmore" style="float: right;">添加新项</button></h1>
                 <table id="demo" lay-filter="test"></table>
-                <form class="layui-form" lay-filter="editForm" id="editForm" hidden action="">
+                <form class="layui-form" lay-filter="editForm" id="editForm"  style="padding:30px 49px 25px 0px" hidden action="">
                     <input type="hidden" name="type_id">
                     <div class="layui-form-item">
                         <label class="layui-form-label">类别名称</label>
@@ -37,7 +56,7 @@
                         </div>
                     </div>
                 </form>
-                <form class="layui-form" lay-filter="addForm" id="addForm" style="padding:30px 10px;" hidden action="">
+                <form class="layui-form" lay-filter="addForm" id="addForm" style="padding:30px 49px 25px 0px;" hidden action="">
                     <div class="layui-form-item">
                         <label class="layui-form-label">类别名称</label>
                         <div class="layui-input-block" style="display: flex;align-items: center;">
@@ -71,19 +90,22 @@
                         $(document).on('click','button[type="reset"]',function(){
                             layer.closeAll();
                         })
+                        $('.back').click(e=>{
+                            window.history.go(-1)
+                        })
                         layui.use(['form', 'table'], function () {
                             var form = layui.form;
                             var table = layui.table;
                             table.render({
                                 elem: '#demo'
-                                ,height: 600
+                                
                                 ,url: '/api/account/getTypeList' //数据接口
                              
                                 ,cols: [[ //表头
                                 
-                                { title: 'ID', width:80, type:'numbers'}
+                                { title: 'ID', width:60, type:'numbers'}
                             
-                                ,{field: 'type_name', title: '名称', sort: true,width:120}
+                                ,{field: 'type_name', title: '名称', sort: true,width:100}
                                 ,{field: 'type_type', title: '类型',sort:true, width:80,
                                 templet: function(d){
                                 
@@ -117,9 +139,10 @@
                               
                                    var ind = layer.open({
                                             type:1,
-                                            area: ['90%', '300px'],
+                                            area: 'auto',
                                             fixed: false, //不固定
                                             maxmin: true,
+                                            maxWidth: 400,
                                             title: '修改记录',
                                             scrollbar:false,
                                             content: $('#editForm')
@@ -160,10 +183,11 @@
                                 // $('#addForm').show();
                                 layer.open({
                                     type:1,
-                                        area: ['90%', '300px'],
+                                        area: 'auto',
                                         fixed: false, //不固定
                                         maxmin: true,
-                                        title: '修改记录',
+                                        maxWidth: 400,
+                                        title: '新增记录',
                                         scrollbar:false,
                                         content: $('#addForm')
                                     });

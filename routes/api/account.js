@@ -195,7 +195,7 @@ router.post('/getAccountData',async function(req,res){
             $sort: {account_date: -1 ,update_time:-1}//降序排序
         }
     ])
-    res.json({code:200,data:result});//答应结果
+    res.json({code:200,data:result,reqUrl: req.originalUrl});//答应结果
 })
 
 

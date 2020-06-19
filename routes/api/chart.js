@@ -88,8 +88,7 @@ router.get('/getDataByMonth',async (req,res) =>{
     }
     function getFilter2(data, condition){
         var first = new Date(date);
-        console.log(first)
-        var dayCount =  new Date(first.getFullYear(),first.getMonth(),0).getDate();
+        var dayCount =  new Date(first.getFullYear(),first.getMonth() + 1,0).getDate();
         var sample = Array.from({length:dayCount}).reduce((t,el,i)=>{
             t[i+1+"日"] = 0;
             return t;

@@ -9,12 +9,28 @@
 <body>
 
     <div class="addContent__container" style="width: 100%;margin:10px auto;padding: 5px;box-sizing: border-box;">
-        <form class="layui-form" lay-filter="demo2" action="">
+        <form id="update122" class="layui-form" lay-filter="demo2" action="">
             <!-- <div class="layui-form-item" style="display: flex;justify-content: center;">
                 <img src="/img/money.svg" alt="" width="30">
             </div> -->
+            <style>
+                #update12{
+                    padding: 5px 10px;;
+                }
+                #update122 .layui-input-block{
+                    margin-left: 95px;;
+                }
+                #update122 .layui-form-label{
+                    line-height: 38px;;
+                }
+                /* #update122 .layui-form-item{
+                    display: flex;
+                    align-items: center;
+                } */
+
+            </style>
             <div class="layui-form-item">
-                <label class="layui-form-label">消费金额</label>
+                <label class="layui-form-label" style="padding: 3px;text-align: center;">消费金额</label>
                 <div class="layui-input-block" style="display: flex;align-items: center;">
                     <span style="padding: 0 10px 0 2px ;">￥</span>
                     <input type="number" name="account_num" lay-verify="required" required placeholder="请输入金额"
@@ -22,21 +38,21 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">消费类型</label>
+                <label class="layui-form-label" style="padding: 3px;text-align: center;">消费类型</label>
                 <div class="layui-input-block">
                     <input type="radio" lay-filter='radio1' name="account_type" value="out" title="支出" checked>
                     <input type="radio" lay-filter='radio1' name="account_type" value="in" title="收入">
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">记录类型</label>
+                <label class="layui-form-label" style="padding: 3px;text-align: center;">记录类型</label>
                 <div class="layui-input-block">
                     <select name="account_reason" id="account_reason">
                     </select>
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">记录时间</label>
+                <label class="layui-form-label" style="padding: 3px;text-align: center;">记录时间</label>
                 <div class="layui-input-block">
                     <input type="text" name="account_date" id="date"
                      lay-verify="date" placeholder="选择记录时间"
@@ -44,7 +60,7 @@
                 </div>
             </div>
             <div class="layui-form-item layui-form-text">
-                <label class="layui-form-label">备注信息</label>
+                <label class="layui-form-label" style="padding: 3px;text-align: center;">备注信息</label>
                 <div class="layui-input-block">
                     <textarea name="account_desc" placeholder="备注这条记录..." class="layui-textarea"></textarea>
                 </div>

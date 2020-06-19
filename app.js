@@ -59,7 +59,8 @@ app.use(function(err, req, res, next) {
   console.log(err)
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  let url = req.originalUrl
+  res.render('error', {url});
 });
 
 module.exports = app;

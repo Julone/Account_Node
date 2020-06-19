@@ -34,6 +34,8 @@
             <script>
                 $(function () {
                     var date = new Date();
+                    $('#cur_Year h1').text(date.getFullYear() + "年");
+                    $('#cur_Month h1').text(date.getMonth() + 1 + "月");
                     var str = Array.from({
                         length: 5
                     }, (el, i) => {
@@ -48,26 +50,50 @@
                     });
                     console.log(str2);
                     $('#month-select').html(str2.join(''));
+             
                     app.loadRecord();
+                 
                 })
             </script>
+              <div class="layui-container">
+                <div class="layui-row" style="margin-bottom: 10px;">
+                    <div class="layui-col-md6 layui-col-xs6">
+                        当月支出： <span id="totalOut">0</span>元
+                    </div>
+                    <div class="layui-col-md6 layui-col-xs6">
+                        当月收入： <span id="totalIn">0</span>元
+                    </div>
+                </div>
+              </div>
+         
         
             <div class="card-container">
                 <div class="card-wrapper">
-                    <blockquote class="layui-elem-quote layui-quote-nm">引用区域的文字</blockquote>
+                    <blockquote class="layui-elem-quote layui-quote-nm">加载数据中</blockquote>
                 </div>
             </div>
             <script>
+                
                 window.app = {
                     async loadRecord(){
+                        $('#cur_Year h1').text(this.ys + "年");
+                        $('#cur_Month h1').text(this.ms + "月");
                         let data = await this.ajax();
+                        var [out_count, in_count] = data.data.reduce((t,el) => {
+                            var target = el.account_type == 'out' ? 0 :1 ; 
+                            t[target] += el.account_num;
+                            return t;
+                        }, [0,0]);
+                        
+                        $('#totalOut').text(out_count);
+                        $('#totalIn').text(in_count);
                         let group = this.formatData(data.data);
                         this.renderDOM(group);
                         this.bindEvent();
+                        window.scrollTo(0,0)
                     },
                     renderDOM(group) {
-                        $('#cur_Year h1').text(this.ys + "年");
-                        $('#cur_Month h1').text(this.ms + "月");
+          
                         var html = '';
                         if(JSON.stringify(group) == '{}'){
                             html += `
@@ -106,8 +132,8 @@
                                             </div>
                                             <div class="desc">
                                                 <div class='desc-left'>  
-                                                备注：
-                                                ${ele.account_desc}
+                                                
+                                                ${ele.account_desc == ''? '' : '备注：' +ele.account_desc}
                                                 </div>
                                                 <div class='desc-right'>
                                                     <button class="layui-btn  layui-btn-xs layui-btn-primary del_btn" data-id="${ele._id}" >删除</button>

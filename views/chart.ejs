@@ -28,7 +28,67 @@
             </div>
 
             <div class="layui-container">
-                <div class="layui-row">
+                <div class="layui-row" style="margin: 10px auto 5px;">
+                    <div class="layui-col-md6 layui-col-xs6">
+                        当月支出： <span id="totalOut">0</span>元
+                    </div>
+                    <div class="layui-col-md6 layui-col-xs6">
+                        当月收入： <span id="totalIn">0</span>元
+                    </div>
+                </div>
+                <style>
+                    .tab{
+                        width: 100%;
+                        display: flex;
+                        margin: 15px 0;
+                        position: relative;
+                    }
+                    .tab div{
+                        flex: 1;
+                        height: 34px;
+                        font-size: 18px;
+                        line-height: 34px;
+                
+                        text-align: center;
+                        /* background:white; */
+                        /* border-bottom: 1px solid gray; */
+                      
+                    }
+                    .tab div.active{
+                        color: rgb(106, 170, 138);
+                        font-weight: 700;
+                        /* border-bottom: 2px solid currentColor; */
+                    }
+                    .activeBar{
+                        position: absolute !important;
+                        width: 50%;
+                        height: 2px !important;
+                        left: 0;
+                        bottom: 0;
+                        background: rgb(106,170,138);
+                    }
+                </style>
+                <div class="tab">
+                    <div data-width="120" class="active">当月支出</div>
+                    <div data-width="70" >当月收入</div>
+                  
+                    <div class="activeBar"></div>
+                </div>
+                <script>
+                    $(function(){
+                        $('#main2,#bing2,#main,#bing').css('width', $('.layui-container').width())
+                        $('.tab>div').click(function(){
+                            $('.tab .activeBar').stop();
+                            $('.tab div').toggleClass('active');
+                            $('#out-panel,#in-panel').toggle();
+                            $('.tab .activeBar').animate({
+                                'left':  $('.tab div.active').offset().left - $('.tab').offset().left + ($('.tab div.active').width() - $('.tab div.active').data('width')) / 2,
+                                'width': $('.tab div.active').data('width')
+                            },500)
+                        })
+                    })
+                </script>
+                <div class="layui-row" id="out-panel">
                     <div class="layui-col-md6">
                         <div id="main" style="width:  100%;height:300px;"></div>
                     </div>
@@ -36,7 +96,7 @@
                         <div id="bing" style="width:  100%;height: 400px;"></div>
                     </div>
                 </div>
-                <div class="layui-row">
+                <div class="layui-row" id="in-panel" style="display: none;">
                     <div class="layui-col-md6">
                         <div id="main2" style="width: 100%;height:300px;"></div>
                     </div>
@@ -50,6 +110,8 @@
             <script>
                 $(function () {
                     var date = new Date();
+                          $('#cur_Year h1').text(date.getFullYear() + "年");
+                    $('#cur_Month h1').text(date.getMonth() + 1 + "月");
                     var str = Array.from({
                         length: 5
                     }, (el, i) => {
@@ -76,6 +138,7 @@
                     loadRecord() {
                         $('#cur_Year h1').text(this.ys + "年");
                         $('#cur_Month h1').text(this.ms + "月");
+                
                         var _this = this;
                         var labelConfig = {
                             formatter: '{a|{a}}{abg|}\n{hr|}\n  {b|{b} }{per|{d}%}  ',
@@ -121,12 +184,22 @@
                                 dateExp: decodeURI(_this.ys + "/" + _this.ms)
                             },
                             success(data) {
+                                console.log(data);
+                                var out_count = data.data.out.data.reduce((t,el) => {
+                                    t += el.account_num;
+                                    return t;
+                                }, 0);
+                                var in_count = data.data.in.data.reduce((t,el) => {
+                                    t += el.account_num;
+                                    return t;
+                                }, 0)
+                                $('#totalOut').text(out_count);
+                                $('#totalIn').text(in_count);
                                 var myChart = echarts.init(document.getElementById('main'));
                                 var myChart2 = echarts.init(document.getElementById('bing'));
                                 var myChart3 = echarts.init(document.getElementById('main2'));
                                 var myChart4 = echarts.init(document.getElementById('bing2'));
-                                
-                
+                          
                                     // 指定图表的配置项和数据
                                     var option = {
                                         title: {
@@ -309,6 +382,7 @@
 
                                 myChart3.setOption(option3);
                                 myChart4.setOption(option4);
+
                                 }
 
 

@@ -28,10 +28,10 @@ router.post('/login',function(req,res,next){
 
 router.post('/regist',function(req,res,next){
     if(req.body.userpass != req.body.userpass2){//如果密码与确认密码不一致
-        res.send(`<script>alert('用户密码和确认密码不一致！');location.href='/regist'</script>`)
+        return res.end(`<script>alert('用户密码和确认密码不一致！');location.href='/regist'</script>`)
     }
     if(/^\w{6,30}$/.test(req.body.userpass) == false){//密码如果不符合规则
-        res.send(`<script>alert('用户密码至少为6位！');location.href='/regist'</script>`)
+        return res.end(`<script>alert('用户密码至少为6位！');location.href='/regist'</script>`)
     }
     var dataModel = {
         user_id: req.body.username,//用户账号
